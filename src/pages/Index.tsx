@@ -357,7 +357,86 @@ const Index = () => {
           </div>
         </section>
 
-        <section id="contacts" className="py-20 bg-muted/30">
+        <section className="py-20 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold mb-4">Отзывы клиентов</h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Что говорят о нас наши клиенты
+              </p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+              {[
+                {
+                  name: 'Александр Петров',
+                  company: 'ТЦ "Галерея"',
+                  rating: 5,
+                  text: 'Профессиональная команда! Установили вентиляцию в торговом центре точно в срок. Качество работы на высшем уровне, всё работает безупречно уже год.',
+                  avatar: 'AP'
+                },
+                {
+                  name: 'Марина Соколова',
+                  company: 'Офис "Технопарк"',
+                  rating: 5,
+                  text: 'Очень довольны VRF-системой кондиционирования. Сотрудники компании грамотно подобрали оборудование, монтаж выполнили аккуратно. Рекомендуем!',
+                  avatar: 'МС'
+                },
+                {
+                  name: 'Дмитрий Волков',
+                  company: 'Частный дом',
+                  rating: 5,
+                  text: 'Установили приточно-вытяжную вентиляцию в загородном доме. Работа выполнена качественно, инженеры дали подробные консультации по эксплуатации.',
+                  avatar: 'ДВ'
+                },
+                {
+                  name: 'Елена Морозова',
+                  company: 'Ресторан "Panorama"',
+                  rating: 5,
+                  text: 'Спасибо за оперативность! Установили промышленную вытяжку для кухни за 2 дня. Отличное соотношение цены и качества.',
+                  avatar: 'ЕМ'
+                },
+                {
+                  name: 'Игорь Кузнецов',
+                  company: 'Производство',
+                  rating: 5,
+                  text: 'Реализовали сложный проект климат-контроля на производстве. Всё продумано до мелочей, система работает стабильно даже при высоких нагрузках.',
+                  avatar: 'ИК'
+                },
+                {
+                  name: 'Ольга Белова',
+                  company: 'Квартира',
+                  rating: 5,
+                  text: 'Установили кондиционер в квартире. Порадовала цена и скорость работы. Монтажники очень аккуратные, всё убрали за собой. Спасибо!',
+                  avatar: 'ОБ'
+                }
+              ].map((review, index) => (
+                <Card key={index} className="hover:shadow-xl transition-all">
+                  <CardHeader>
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold">
+                        {review.avatar}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold">{review.name}</h3>
+                        <p className="text-sm text-muted-foreground">{review.company}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-1 mb-3">
+                      {Array.from({ length: review.rating }).map((_, i) => (
+                        <Icon key={i} name="Star" size={16} className="text-yellow-500 fill-yellow-500" />
+                      ))}
+                    </div>
+                    <CardDescription className="text-base leading-relaxed">
+                      "{review.text}"
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="contacts" className="py-20">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
