@@ -3,7 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import Icon from '@/components/ui/icon';
+import CostCalculator from '@/components/CostCalculator';
 
 const Index = () => {
   const [formData, setFormData] = useState({
@@ -12,10 +14,37 @@ const Index = () => {
     email: '',
     message: ''
   });
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/57c1239c-55a1-4e05-a12e-851a9f2bd05b', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSubmitStatus({ type: 'success', message: data.message || 'Заявка отправлена!' });
+        setFormData({ name: '', phone: '', email: '', message: '' });
+      } else {
+        setSubmitStatus({ type: 'error', message: data.error || 'Ошибка отправки заявки' });
+      }
+    } catch (error) {
+      setSubmitStatus({ type: 'error', message: 'Не удалось отправить заявку. Проверьте подключение к интернету.' });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const scrollToSection = (id: string) => {
@@ -40,9 +69,64 @@ const Index = () => {
               <button onClick={() => scrollToSection('about')} className="text-sm font-medium hover:text-primary transition-colors">О компании</button>
               <button onClick={() => scrollToSection('contacts')} className="text-sm font-medium hover:text-primary transition-colors">Контакты</button>
             </div>
-            <Button onClick={() => scrollToSection('contacts')} className="hidden md:inline-flex">
-              Связаться
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button onClick={() => scrollToSection('contacts')} className="hidden md:inline-flex">
+                Связаться
+              </Button>
+              <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="md:hidden">
+                    <Icon name="Menu" size={24} />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[280px]">
+                  <div className="flex flex-col gap-6 mt-8">
+                    <button 
+                      onClick={() => { scrollToSection('hero'); setIsMenuOpen(false); }} 
+                      className="text-lg font-medium hover:text-primary transition-colors text-left"
+                    >
+                      Главная
+                    </button>
+                    <button 
+                      onClick={() => { scrollToSection('services'); setIsMenuOpen(false); }} 
+                      className="text-lg font-medium hover:text-primary transition-colors text-left"
+                    >
+                      Услуги
+                    </button>
+                    <button 
+                      onClick={() => { scrollToSection('equipment'); setIsMenuOpen(false); }} 
+                      className="text-lg font-medium hover:text-primary transition-colors text-left"
+                    >
+                      Оборудование
+                    </button>
+                    <button 
+                      onClick={() => { scrollToSection('projects'); setIsMenuOpen(false); }} 
+                      className="text-lg font-medium hover:text-primary transition-colors text-left"
+                    >
+                      Проекты
+                    </button>
+                    <button 
+                      onClick={() => { scrollToSection('about'); setIsMenuOpen(false); }} 
+                      className="text-lg font-medium hover:text-primary transition-colors text-left"
+                    >
+                      О компании
+                    </button>
+                    <button 
+                      onClick={() => { scrollToSection('contacts'); setIsMenuOpen(false); }} 
+                      className="text-lg font-medium hover:text-primary transition-colors text-left"
+                    >
+                      Контакты
+                    </button>
+                    <Button 
+                      onClick={() => { scrollToSection('contacts'); setIsMenuOpen(false); }} 
+                      className="w-full mt-4"
+                    >
+                      Связаться
+                    </Button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
         </nav>
       </header>
@@ -133,7 +217,13 @@ const Index = () => {
           </div>
         </section>
 
-        <section id="equipment" className="py-20">
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <CostCalculator />
+          </div>
+        </section>
+
+        <section id="equipment" className="py-20 bg-muted/30">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-bold mb-4">Оборудование</h2>
@@ -315,8 +405,13 @@ const Index = () => {
                           rows={4}
                         />
                       </div>
-                      <Button type="submit" className="w-full" size="lg">
-                        Отправить заявку
+                      {submitStatus && (
+                        <div className={`p-4 rounded-lg ${submitStatus.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+                          {submitStatus.message}
+                        </div>
+                      )}
+                      <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+                        {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
                       </Button>
                     </form>
                   </CardContent>
